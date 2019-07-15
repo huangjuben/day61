@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+namespace就是用来隔离sql语句的
+-->
+<mapper namespace="com.ssm.mapper.BrandMapper">
+    <resultMap id="BrandMap" type="brand">
+        <id property="brandId" column="brand_id"/>
+        <result property="brandName" column="brand_name"/>
+        <result property="telephone" column="telephone"/>
+        <result property="brandWeb" column="brand_web"/>
+        <result property="brandLogo" column="brand_logo"/>
+        <result property="brandDesc" column="brand_desc"/>
+        <result property="brandStatus" column="brand_status"/>
+        <result property="brandOrder" column="brand_order"/>
+        <result property="modifiedTime" column="modified_time"/>
+    </resultMap>
+
+    <select id="queryBrand" resultMap="BrandMap">
+        select * from sy_brand_info
+        <where>
+            <if test="brandName !=null and brandName!=''">
+                and brand_name like concat("%",#{brandName},"%")
+            </if>
+        </where>
+    </select>
+
+    <insert id="addBrand">
+        insert into sy_brand_info(brand_name,telephone,brand_web,brand_desc,brand_status) values
+        (#{brandName},#{telephone},#{brandWeb},#{brandDesc},#{brandStatus})
+    </insert>
+
+    <delete id="brandDelete">
+        delete from sy_brand_info where brand_id=#{brandId}
+    </delete>
+
+    <delete id="brandDeleteBatch">
+        delete from sy_brand_info where brand_id in
+        <foreach collection="brandDel" item="brandId" open="(" close=")" separator=",">
+            #{brandId}
+        </foreach>
+
+    </delete>
+
+
+    <select id="queryBrandId" resultMap="BrandMap">
+        select * from sy_brand_info where brand_id=#{brandId}
+    </select>
+
+
+    <update id="updateBrand">
+        update sy_brand_info set brand_name=#{brandName},telephone=#{telephone},brand_web=#{brandWeb},brand_logo=#{brandDesc}
+        where brand_id=#{brandId}
+    </update>
+
+
+    <select id="brandPageCount" resultType="int">
+        select count(*) from sy_brand_info
+        <where>
+            <if test="brandName!=null and brandName!=''">
+                brand_name like concat("%",#{brandName},"%")
+            </if>
+        </where>
+    </select>
+
+    <select id="brandPage" resultMap="BrandMap">
+        select * from sy_brand_info
+        <where>
+            <if test="brandName!=null and brandName!=''">
+                brand_name like concat("%",#{brandName},"%")
+            </if>
+        </where>
+        limit #{begin},#{limit}
+    </select>
+</mapper>

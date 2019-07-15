@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+namespace就是用来隔离sql语句的
+-->
+<mapper namespace="com.ssm.mapper.UserMapper" >
+    <resultMap id="BaseUserMap" type="user">
+        <id column="user_id" property="userId"/>
+        <result column="user_account" property="userAccount"/>
+        <result column="user_name" property="userName"/>
+        <result column="password" property="password"/>
+        <result column="headimageurl" property="headImageUrl"/>
+        <result column="mobile_number" property="mobileNumber"/>
+        <result column="email" property="email"/>
+        <result column="status" property="status"/>
+        <result column="last_login_time" property="lastLoginTime"/>
+        <result column="create_time" property="createTime"/>
+        <result column="create_user_id" property="createUserId"/>
+        <result column="modify_time" property="modifyTime"/>
+        <result column="sex" property="sex"/>
+        <result column="modify_user_id" property="modifyUserId"/>
+    </resultMap>
+
+    <!--查询用户名和密码-->
+    <select id="queryNameAndPwd" resultMap="BaseUserMap">
+        select * from sy_user where user_account=#{username} and password=#{password}
+        and status=1
+    </select>
+
+
+    <!--查询所有-->
+    <select id="queryUser" resultMap="BaseUserMap">
+        select * from sy_user
+        <where>
+            <if test="uname!=null and  uname!=''">
+                and user_account like concat("%",#{uname},"%")
+            </if>
+        </where>
+    </select>
+
+    <!--添加数据-->
+    <insert id="addUser">
+        insert into sy_user(user_account,password,create_time,sex,mobile_number,email)
+        values(#{userAccount},#{password},#{createTime},#{sex},#{mobileNumber},#{email})
+    </insert>
+
+    <!--删除数据-->
+    <delete id="deleteId" >
+        delete from sy_user where user_id=#{userId}
+    </delete>
+    <!--批量删除数据-->
+    <delete id="batchDeleteId" >
+        delete from sy_user where user_id in
+        <foreach collection="ids" open="(" close=")" separator="," item="id">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!--重置密码-->
+    <update id="resetPassword" >
+        update sy_user set password=#{password} where user_id=#{userId}
+    </update>
+
+
+    <!--根据用户名模糊查询条数-->
+    <select id="queryPageCount" resultType="int">
+        select count(*) from sy_user
+        <where>
+            <if test="name!=null and name!=''">
+                user_account like "%"#{name}"%"
+            </if>
+        </where>
+    </select>
+
+    <!--根据用户名模糊查询条数并分页-->
+    <select id="queryPage" resultMap="BaseUserMap">
+        select * from sy_user
+        <where>
+            <if test="name!=null and name!=''">
+                user_account like "%"#{name}"%"
+            </if>
+        </where>
+        limit #{begin},#{limit}
+    </select>
+
+    <!--根据ID查询-->
+    <select id="queryId" resultType="int" resultMap="BaseUserMap">
+        select * from sy_user where user_id=#{userId}
+    </select>
+    <!--修改用户信息-->
+    <update id="updateUser" >
+        update sy_user set user_account=#{userAccount},sex=#{sex},mobile_number=#{mobileNumber},email=#{email}
+        where user_id =#{userId}
+    </update>
+
+    <!--上传头像-->
+    <update id="upload" >
+        update sy_user set headimageurl=#{url}
+        where user_id =#{userId}
+    </update>
+
+    <select id="queryHead" resultType="string">
+        select headimageurl from sy_user where user_id=#{userId}
+    </select>
+
+
+</mapper>
